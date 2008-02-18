@@ -6,6 +6,7 @@ if [ -f dist/pydkim-$VERSION.tar.gz ]; then
     echo "version already exists"
     exit 1
 fi
+perl -pi -e "s/pydkim [0-9.]+/pydkim $VERSION/g" README
 epydoc dkim
 python2.5 setup.py sdist --formats gztar
 MD5_GZTAR=`md5 dist/pydkim-$VERSION.tar.gz | cut -d' ' -f4`

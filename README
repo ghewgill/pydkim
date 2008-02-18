@@ -1,0 +1,50 @@
+pydkim - DKIM (DomainKeys Identified Mail)
+http://hewgill.com/pydkim/
+
+INTRODUCTION
+
+pydkim is a library that implements DKIM (DomainKeys Identified Mail) email
+signing and verification.
+
+VERSION
+
+This is pydkim 0.1.
+
+REQUIREMENTS
+
+Python 2.5 or later is required.
+The dnspython library (http://www.dnspython.org) library is required.
+
+INSTALLATION
+
+To build and install pydkim:
+
+    python setup.py install
+
+USAGE
+
+The pydkim library offers one module called dkim. The sign() function takes an
+RFC822 formatted message, along with some signing options, and returns a
+DKIM-Signature header line that can be prepended to the message. The verify()
+function takes an RFC822 formatted message, and returns True or False depending
+on whether the signature verifies correctly.
+
+For full documentation, see: http://hewgill.local/pydkim/html/
+
+Two helper programs are also supplied: dkimsign.py and dkimverify.py.
+
+dkimsign.py is a filter that reads an RFC822 message on standard input, and
+writes the same message on standard output with a DKIM-Signature line
+prepended. The signing options are specified on the command line:
+
+dkimsign.py selector domain privatekeyfile [identity]
+
+The identity is optional and defaults to "@domain".
+
+dkimverify.py reads an RFC822 message on standard input, and returns with exit
+code 0 if the signature verifies successfully. Otherwise, it returns with exit
+code 1. 
+
+FEEDBACK
+
+Bug reports may be sent to <greg@hewgill.com>.
