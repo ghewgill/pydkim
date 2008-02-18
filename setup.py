@@ -8,7 +8,7 @@ setup(
     description = "DKIM (DomainKeys Identified Mail)",
     author = "Greg Hewgill",
     author_email = "greg@hewgill.com",
-    url = "http://hewgill.com/software/pydkim/",
+    url = "http://hewgill.com/pydkim/",
     py_modules = ["dkim"],
     scripts = ["dkimsign.py", "dkimverify.py", "dkimsend.sh"],
 )
