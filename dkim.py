@@ -357,14 +357,6 @@ def verify(message, debuglog=None):
     if debuglog is not None:
         print >>debuglog, "modlen:", modlen
 
-    #pemkey = "-----BEGIN PUBLIC KEY-----\n"
-    #p = pub['p']
-    #while len(p):
-    #    pemkey += p[0:64]+"\n"
-    #    p = p[64:]
-    #pemkey += "-----END PUBLIC KEY-----\n"
-    #pubkey = POW.pemRead(POW.RSA_PUBLIC_KEY, pemkey)
-
     include_headers = re.split(r"\s*:\s*", sig['h'])
     if debuglog is not None:
         print >>debuglog, "include_headers:", include_headers
