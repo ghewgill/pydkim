@@ -1,3 +1,21 @@
+# This software is provided 'as-is', without any express or implied
+# warranty.  In no event will the author be held liable for any damages
+# arising from the use of this software.
+# 
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
+# 
+# 1. The origin of this software must not be misrepresented; you must not
+#    claim that you wrote the original software. If you use this software
+#    in a product, an acknowledgment in the product documentation would be
+#    appreciated but is not required.
+# 2. Altered source versions must be plainly marked as such, and must not be
+#    misrepresented as being the original software.
+# 3. This notice may not be removed or altered from any source distribution.
+# 
+# Copyright (c) 2008 Greg Hewgill http://hewgill.com
+
 import base64
 import hashlib
 import re
@@ -235,8 +253,10 @@ def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple
     headers = canonicalize[0].canonicalize_headers(headers)
 
     if include_headers is None:
-        include_headers = [x[0] for x in headers]
-    sign_headers = [x for x in headers if x[0] in include_headers]
+        include_headers = [x[0].lower() for x in headers]
+    else:
+        include_headers = [x.lower() for x in include_headers]
+    sign_headers = [x for x in headers if x[0].lower() in include_headers]
 
     body = canonicalize[1].canonicalize_body(body)
 
@@ -297,7 +317,7 @@ def verify(message, debuglog=None):
 
     sigheaders = [x for x in headers if x[0].lower() == "dkim-signature"]
     if len(sigheaders) != 1:
-        return None
+        return False
 
     a = re.split(r"\s*;\s*", sigheaders[0][1].strip())
     if debuglog is not None:
@@ -335,16 +355,21 @@ def verify(message, debuglog=None):
 
     h = hasher()
     h.update(body)
+    bodyhash = h.digest()
     if debuglog is not None:
-        print >>debuglog, "bh:", base64.b64encode(h.digest())
+        print >>debuglog, "bh:", base64.b64encode(bodyhash)
+    if bodyhash != base64.b64decode(re.sub(r"\s+", "", sig['bh'])):
+        if debuglog is not None:
+            print >>debuglog, "body hash mismatch"
+        return False
 
     s = dnstxt(sig['s']+"._domainkey."+sig['d']+".")
     if not s:
         return False
-    a = re.split(r";\s*", s)
+    a = re.split(r"\s*;\s*", s)
     pub = {}
     for f in a:
-        m = re.match(r"(.)=(.*)", f)
+        m = re.match(r"(\w+)=(.*)", f)
         if m:
             pub[m.group(1)] = m.group(2)
     x = asn1_parse(ASN1_Object, base64.b64decode(pub['p']))
