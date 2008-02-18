@@ -20,9 +20,11 @@
 
 from distutils.core import setup
 
+version = "0.1"
+
 setup(
     name = "pydkim",
-    version = "0.1",
+    version = version,
     description = "DKIM (DomainKeys Identified Mail)",
     long_description =
     """pydkim is a Python library that implements DKIM (DomainKeys
