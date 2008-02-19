@@ -1,2 +1,2 @@
-include LICENSE README TODO
+include README LICENSE TODO ChangeLog
 include *.py *.sh

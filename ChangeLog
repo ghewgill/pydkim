@@ -1,0 +1,11 @@
+2008-02-19 Version 0.2
+
+    - handle "rsa-sha1" algorithm properly
+    - handle multiple DKIM-Signature lines
+    - handle FWS around = in DKIM-Signature lines
+    - handle case of single canonicalization algorithm
+    - handle l= signature property
+
+2008-02-18 Version 0.1
+
+    - initial release
