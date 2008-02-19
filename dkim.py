@@ -171,6 +171,9 @@ def asn1_build(node):
     else:
         print "unexpected tag"
 
+HASHID_SHA1 = "\x2b\x0e\x03\x02\x1a"
+HASHID_SHA256 = "\x60\x86\x48\x01\x65\x03\x04\x02\x01"
+
 def str2int(s):
     r = 0
     for c in s:
@@ -316,19 +319,22 @@ def verify(message, debuglog=None):
     (headers, body) = rfc822_parse(message)
 
     sigheaders = [x for x in headers if x[0].lower() == "dkim-signature"]
-    if len(sigheaders) != 1:
+    if len(sigheaders) < 1:
         return False
 
     a = re.split(r"\s*;\s*", sigheaders[0][1].strip())
     if debuglog is not None:
         print >>debuglog, "a:", a
-    sig = dict((x.group(1), x.group(2)) for x in [re.match(r"(\w+)=(.*)", y, re.DOTALL) for y in a if y])
+    sig = dict((x.group(1), x.group(2)) for x in [re.match(r"(\w+)\s*=\s*(.*)", y, re.DOTALL) for y in a if y])
     if debuglog is not None:
         print >>debuglog, "sig:", sig
 
-    m = re.match("(\w+)/(\w+)$", sig['c'])
+    m = re.match("(\w+)(?:/(\w+))?$", sig['c'])
     can_headers = m.group(1)
-    can_body = m.group(2)
+    if m.group(2) is not None:
+        can_body = m.group(2)
+    else:
+        can_body = "simple"
 
     if can_headers == "simple":
         canonicalize_headers = Simple
@@ -348,10 +354,15 @@ def verify(message, debuglog=None):
 
     if sig['a'] == "rsa-sha1":
         hasher = hashlib.sha1
+        hashid = HASHID_SHA1
     elif sig['a'] == "rsa-sha256":
         hasher = hashlib.sha256
+        hashid = HASHID_SHA256
     else:
         raise ParameterError()
+
+    if 'l' in sig:
+        body = body[:int(sig['l'])]
 
     h = hasher()
     h.update(body)
@@ -411,8 +422,7 @@ def verify(message, debuglog=None):
     dinfo = asn1_build(
         (SEQUENCE, [
             (SEQUENCE, [
-                #(OBJECT_IDENTIFIER, "\x2b\x0e\x03\x02\x1a"), # sha1
-                (OBJECT_IDENTIFIER, "\x60\x86\x48\x01\x65\x03\x04\x02\x01"), # sha256
+                (OBJECT_IDENTIFIER, hashid),
                 (NULL, None),
             ]),
             (OCTET_STRING, d),
