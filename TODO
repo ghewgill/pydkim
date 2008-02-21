@@ -1,9 +1,3 @@
-The l= (length) tag needs to be handled appropriately in sign().
-
-Validation of all parsing in verify() (check regular expressions match etc).
-
-Check for length of signing hash compared to the length of the RSA modulus.
-
 Handle multiple DKIM-Signature header lines, ie. more than just the first one.
 
 It should be possible to remove the dependency on dnspython by using something
