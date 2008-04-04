@@ -271,7 +271,7 @@ def dnstxt(name):
     a = dns.resolver.query(name, dns.rdatatype.TXT)
     for r in a.response.answer:
         if r.rdtype == dns.rdatatype.TXT:
-            return "".join(r[0].strings)
+            return "".join(r.items[0].strings)
     return None
 
 def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple, Simple), include_headers=None, length=False, debuglog=None):
