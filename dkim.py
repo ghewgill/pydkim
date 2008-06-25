@@ -274,6 +274,25 @@ def dnstxt(name):
             return "".join(r.items[0].strings)
     return None
 
+def fold(header):
+    """Fold a header line into multiple crlf-separated lines at column 72."""
+    i = header.rfind("\r\n ")
+    if i == -1:
+        pre = ""
+    else:
+        i += 3
+        pre = header[:i]
+        header = header[i:]
+    while len(header) > 72:
+        i = header[:72].rfind(" ")
+        if i == -1:
+            j = i
+        else:
+            j = i + 1
+        pre += header[:i] + "\r\n "
+        header = header[j:]
+    return pre + header
+
 def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple, Simple), include_headers=None, length=False, debuglog=None):
     """Sign an RFC822 message and return the DKIM-Signature header line.
 
@@ -345,6 +364,8 @@ def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple
         ('b', ""),
     ] if x]
     sig = "DKIM-Signature: " + "; ".join("%s=%s" % x for x in sigfields)
+
+    sig = fold(sig)
 
     if debuglog is not None:
         print >>debuglog, "sign headers:", sign_headers + [("DKIM-Signature", " "+"; ".join("%s=%s" % x for x in sigfields))]
