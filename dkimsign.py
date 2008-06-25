@@ -29,7 +29,10 @@ if len(sys.argv) < 4 or len(sys.argv) > 5:
 selector = sys.argv[1]
 domain = sys.argv[2]
 privatekeyfile = sys.argv[3]
-identity = len(sys.argv) >= 5 and sys.argv[4]
+if len(sys.argv) > 5:
+    identity = sys.argv[4]
+else:
+    identity = None
 
 message = sys.stdin.read()
 try:
