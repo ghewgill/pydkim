@@ -1,3 +1,10 @@
+2008-06-25 Version 0.3
+
+    - length parameter to sign() is now a boolean
+    - sign() now folds the DKIM-Signature line
+    - validation of all inputs
+    - general code cleanup
+
 2008-02-19 Version 0.2
 
     - handle "rsa-sha1" algorithm properly
