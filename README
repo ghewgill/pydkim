@@ -15,6 +15,11 @@ REQUIREMENTS
 Python 2.5 or later is required.
 The dnspython library (http://www.dnspython.org) library is required.
 
+The library will operate in a degraded mode under Python 2.4, where only
+the SHA-1 algorithm is used for signing and available for verification.
+This is because the hashlib module that offers SHA-256 is available from
+Python 2.5 onwards.
+
 INSTALLATION
 
 To build and install pydkim:
