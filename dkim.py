@@ -17,11 +17,20 @@
 # Copyright (c) 2008 Greg Hewgill http://hewgill.com
 
 import base64
-import hashlib
 import re
 import time
 
 import dns.resolver
+
+# For compatibility with Python 2.4, import the sha module if hashlib
+# does not exist. When using Python 2.4, messages are signed with SHA-1
+# instead of SHA-256, and only SHA-1 is supported on verify.
+HaveSHA256 = False
+try:
+    import hashlib
+    HaveSHA256 = True
+except:
+    import sha
 
 __all__ = [
     "Simple",
@@ -345,13 +354,16 @@ def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple
 
     body = canonicalize[1].canonicalize_body(body)
 
-    h = hashlib.sha256()
+    if HaveSHA256:
+        h = hashlib.sha256()
+    else:
+        h = sha.sha()
     h.update(body)
     bodyhash = base64.b64encode(h.digest())
 
     sigfields = [x for x in [
         ('v', "1"),
-        ('a', "rsa-sha256"),
+        ('a', HaveSHA256 and "rsa-sha256" or "rsa-sha1"),
         ('c', "%s/%s" % (canonicalize[0].name, canonicalize[1].name)),
         ('d', domain),
         ('i', identity or "@"+domain),
@@ -369,7 +381,10 @@ def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple
 
     if debuglog is not None:
         print >>debuglog, "sign headers:", sign_headers + [("DKIM-Signature", " "+"; ".join("%s=%s" % x for x in sigfields))]
-    h = hashlib.sha256()
+    if HaveSHA256:
+        h = hashlib.sha256()
+    else:
+        h = sha.sha()
     for x in sign_headers:
         h.update(x[0])
         h.update(":")
@@ -382,7 +397,7 @@ def sign(message, selector, domain, privkey, identity=None, canonicalize=(Simple
     dinfo = asn1_build(
         (SEQUENCE, [
             (SEQUENCE, [
-                (OBJECT_IDENTIFIER, HASHID_SHA256),
+                (OBJECT_IDENTIFIER, HaveSHA256 and HASHID_SHA256 or HASHID_SHA1),
                 (NULL, None),
             ]),
             (OCTET_STRING, d),
@@ -525,9 +540,16 @@ def verify(message, debuglog=None):
         return False
 
     if sig['a'] == "rsa-sha1":
-        hasher = hashlib.sha1
+        if HaveSHA256:
+            hasher = hashlib.sha1
+        else:
+            hasher = sha.sha
         hashid = HASHID_SHA1
     elif sig['a'] == "rsa-sha256":
+        if not HaveSHA256:
+            if debuglog is not None:
+                print >>debuglog, "Unsupported signature algorithm (%s)" % sig['a']
+            return False
         hasher = hashlib.sha256
         hashid = HASHID_SHA256
     else:
