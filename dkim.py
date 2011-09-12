@@ -20,8 +20,6 @@ import base64
 import re
 import time
 
-import dns.resolver
-
 # For compatibility with Python 2.4, import the sha module if hashlib
 # does not exist. When using Python 2.4, messages are signed with SHA-1
 # instead of SHA-256, and only SHA-1 is supported on verify.
@@ -277,6 +275,7 @@ def rfc822_parse(message):
 
 def dnstxt(name):
     """Return a TXT record associated with a DNS name."""
+    import dns.resolver
     a = dns.resolver.query(name, dns.rdatatype.TXT)
     for r in a.response.answer:
         if r.rdtype == dns.rdatatype.TXT:
