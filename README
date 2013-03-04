@@ -1,6 +1,12 @@
 pydkim - DKIM (DomainKeys Identified Mail)
 http://hewgill.com/pydkim/
 
+OBSOLETE
+
+This repository is the last release of pydkim from 2008. The latest version
+is a fork found at dkimpy in Launchpad and is under active development:
+https://launchpad.net/dkimpy
+
 INTRODUCTION
 
 pydkim is a library that implements DKIM (DomainKeys Identified Mail) email
